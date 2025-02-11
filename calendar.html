@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Productivity Calendar{% endblock %}
+
+{% block window_title %}PRODUCTIVITY CALENDAR{% endblock %}
+
+{% block window_controls %}
+    <!-- Add any controls you want here, like a back button -->
+{% endblock %}
+
+{% block content %}
+<div class="calendar-container">
+    <div class="calendar-grid">
+        {% for week in range(53) %}
+        <div class="calendar-week">
+            {% for day in range(7) %}
+                {% set index = week * 7 + day %}
+                {% set current_date = calendar_dates[index] %}
+                <div class="calendar-day
+                    {% if current_date > today %}future-day{% endif %}
+                    intensity-{{ date_counts.get(current_date, 0) if date_counts.get(current_date, 0) < 4 else 3 }}"
+                    title="{{ current_date.strftime('%Y-%m-%d') }}: {{ date_counts.get(current_date, 0) }} completion{% if date_counts.get(current_date, 0) != 1 %}s{% endif %}">
+                </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

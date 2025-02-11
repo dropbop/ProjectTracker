@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Projects - {{ current_category | title }}{% endblock %}
+
+{% block window_title %}PROJECTS - {{ current_category | upper }}{% endblock %}
+
+{% block window_controls %}
+<a href="{{ url_for('add_project') }}" class="control-button">ADD NEW PROJECT</a>
+<a href="{{ url_for('list_all_tasks') }}" class="control-button">VIEW ALL TASKS</a>
+<a href="{{ url_for('productivity_calendar') }}" class="control-button">VIEW CALENDAR</a>  <!-- Added line -->
+{% endblock %}
+
+{% block content %}
+<form method="POST" action="{{ url_for('set_style_route') }}" style="margin-bottom: 16px;">
+    <label for="style_selector" class="form-label">SELECT STYLE:</label>
+    <select name="selected_style" id="style_selector" class="select-input" onchange="this.form.submit()">
+        {% for css_file in css_files %}
+        <option value="{{ css_file }}" {% if css_file == session.get('current_style', 'default.css') %}selected{% endif %}>{{ css_file[:-4] | upper }}</option>
+        {% endfor %}
+    </select>
+</form>
+<div class="category-nav">
+    {% for cat in categories %}
+        <a href="{{ url_for('list_projects_by_category', category=cat) }}"
+           {% if cat == current_category %}class="category-link active"{% else %}class="category-link"{% endif %}>
+            {{ cat | upper }}
+        </a>
+    {% endfor %}
+</div>
+
+<div class="sort-options">
+    SORT BY:
+    {% if sort_by == 'start_date' %}
+        {% if sort_order == 'asc' %}
+            <a href="{{ url_for('list_projects_by_category', category=current_category, sort_by='start_date', order='desc') }}" class="sort-link">START DATE ▲</a>
+        {% else %}
+            <a href="{{ url_for('list_projects_by_category', category=current_category, sort_by='start_date', order='asc') }}" class="sort-link">START DATE ▼</a>
+        {% endif %}
+    {% else %}
+        <a href="{{ url_for('list_projects_by_category', category=current_category, sort_by='start_date', order='asc') }}" class="sort-link">START DATE</a>
+    {% endif %}
+
+    {% if sort_by == 'target_completion_date' %}
+        {% if sort_order == 'asc' %}
+            <a href="{{ url_for('list_projects_by_category', category=current_category, sort_by='target_completion_date', order='desc') }}" class="sort-link">TARGET COMPLETION DATE ▲</a>
+        {% else %}
+            <a href="{{ url_for('list_projects_by_category', category=current_category, sort_by='target_completion_date', order='asc') }}" class="sort-link">TARGET COMPLETION DATE ▼</a>
+        {% endif %}
+    {% else %}
+        <a href="{{ url_for('list_projects_by_category', category=current_category, sort_by='target_completion_date', order='asc') }}" class="sort-link">TARGET COMPLETION DATE</a>
+    {% endif %}
+
+    {% if sort_by == 'next_task_due_date' %}
+        {% if sort_order == 'asc' %}
+            <a href="{{ url_for('list_projects_by_category', category=current_category, sort_by='next_task_due_date', order='desc') }}" class="sort-link">NEXT TASK DUE DATE ▲</a>
+        {% else %}
+            <a href="{{ url_for('list_projects_by_category', category=current_category, sort_by='next_task_due_date', order='asc') }}" class="sort-link">NEXT TASK DUE DATE ▼</a>
+        {% endif %}
+    {% else %}
+        <a href="{{ url_for('list_projects_by_category', category=current_category, sort_by='next_task_due_date', order='asc') }}" class="sort-link">NEXT TASK DUE DATE</a>
+    {% endif %}
+</div>
+
+<div class="list-container">
+    {% for project in projects %}
+        <div class="list-item">
+            <h3 class="list-item-title"><a href="{{ url_for('view_project', project_id=project.id) }}">{{ project.title | upper }}</a></h3>
+            <p class="body-text"><strong>DESCRIPTION:</strong></p>
+            <p class="body-text"><pre class="description-text text-wrap">{{ project.description | default('NO DESCRIPTION PROVIDED') }}</pre></p>
+            <p class="body-text"><strong>START DATE:</strong> {{ project.start_date }}</p>
+            {% if project.target_completion_date %}
+                <p class="body-text"><strong>TARGET COMPLETION DATE:</strong> {{ project.target_completion_date }}</p>
+            {% endif %}
+            <p class="body-text"><strong>STATUS:</strong> {{ project.status | upper }}</p>
+        </div>
+    {% else %}
+        <p class="body-text">NO PROJECTS IN THE {{ current_category | upper }} CATEGORY.</p>
+    {% endfor %}
+</div>
+{% endblock %}

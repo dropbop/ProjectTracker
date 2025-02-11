@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}All Tasks{% endblock %}
+
+{% block window_title %}ALL TASKS{% endblock %}
+
+{% block window_controls %}
+<a href="{{ url_for('list_projects_by_category') }}" class="control-button">BACK TO PROJECTS</a>
+<a href="{{ url_for('productivity_calendar') }}" class="control-button">VIEW CALENDAR</a> <!-- Added Line -->
+{% endblock %}
+
+{% block content %}
+<form method="GET" id="filterForm" action="{{ url_for('list_all_tasks') }}" style="margin-bottom: 16px;">
+    <input type="hidden" name="sort_by" value="{{ sort_by }}">
+    <input type="hidden" name="order" value="{{ order }}">
+    <div class="filters-container">
+        <div class="filter-section">
+            <p class="body-text"><strong>FILTER BY PROJECT STATUS:</strong></p>
+            <label class="checkbox-label">
+                <input type="checkbox" name="project_status" value="active" {% if 'active' in selected_project_statuses %}checked{% endif %} onchange="document.getElementById('filterForm').submit()"> Active
+            </label>
+            <label class="checkbox-label">
+                <input type="checkbox" name="project_status" value="on hold" {% if 'on hold' in selected_project_statuses %}checked{% endif %} onchange="document.getElementById('filterForm').submit()"> On Hold
+            </label>
+            <label class="checkbox-label">
+                <input type="checkbox" name="project_status" value="complete" {% if 'complete' in selected_project_statuses %}checked{% endif %} onchange="document.getElementById('filterForm').submit()"> Complete
+            </label>
+            <label class="checkbox-label">
+                <input type="checkbox" name="project_status" value="archived" {% if 'archived' in selected_project_statuses %}checked{% endif %} onchange="document.getElementById('filterForm').submit()"> Archived
+            </label>
+        </div>
+
+        <div class="filter-section">
+            <p class="body-text"><strong>FILTER BY TASK STATUS:</strong></p>
+            <label class="checkbox-label">
+                <input type="checkbox" name="task_status" value="active" {% if 'active' in selected_task_statuses %}checked{% endif %} onchange="document.getElementById('filterForm').submit()"> Active
+            </label>
+            <label class="checkbox-label">
+                <input type="checkbox" name="task_status" value="on hold" {% if 'on hold' in selected_task_statuses %}checked{% endif %} onchange="document.getElementById('filterForm').submit()"> On Hold
+            </label>
+            <label class="checkbox-label">
+                <input type="checkbox" name="task_status" value="completed" {% if 'completed' in selected_task_statuses %}checked{% endif %} onchange="document.getElementById('filterForm').submit()"> Completed
+            </label>
+            <label class="checkbox-label">
+                <input type="checkbox" name="task_status" value="cancelled" {% if 'cancelled' in selected_task_statuses %}checked{% endif %} onchange="document.getElementById('filterForm').submit()"> Cancelled
+            </label>
+        </div>
+    </div>
+</form>
+
+<div class="sort-options">
+    SORT BY:
+    {% if sort_by == 'due_date' %}
+        {% if order == 'asc' %}
+            <a href="{{ url_for('list_all_tasks', sort_by='due_date', order='desc', project_status=selected_project_statuses, task_status=selected_task_statuses) }}" class="sort-link">DUE DATE ▲</a>
+        {% else %}
+            <a href="{{ url_for('list_all_tasks', sort_by='due_date', order='asc', project_status=selected_project_statuses, task_status=selected_task_statuses) }}" class="sort-link">DUE DATE ▼</a>
+        {% endif %}
+    {% else %}
+        <a href="{{ url_for('list_all_tasks', sort_by='due_date', order='asc', project_status=selected_project_statuses, task_status=selected_task_statuses) }}" class="sort-link">DUE DATE</a>
+    {% endif %}
+</div>
+
+<div class="list-container">
+    {% for task in tasks %}
+        <div class="list-item">
+            <h3 class="list-item-title">{{ task.description }}</h3>
+            <p class="body-text"><strong>DUE DATE:</strong> {{ task.target_completion_date or 'NO DUE DATE' }}</p>
+            <p class="body-text"><strong>PROJECT:</strong> <a href="{{ url_for('view_project', project_id=task.project_id) }}">{{ task.project_title }}</a></p>
+            <p class="body-text"><strong>STATUS:</strong> {{ task.status | upper }}</p>
+        </div>
+    {% else %}
+        <p class="body-text">NO TASKS FOUND.</p>
+    {% endfor %}
+</div>
+{% endblock %}

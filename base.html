@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Project Tracker{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename=session.get('current_style', 'default.css')) }}">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}" type="image/png"> 
+</head>
+<body>
+    <div class="app-window">
+        <div class="title-bar">
+            <span class="window-title">{% block window_title %}{% endblock %}</span>
+            <div class="window-controls">
+                {% block window_controls %}{% endblock %}
+            </div>
+        </div>
+        <div class="main-content">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Project - {{ project.title }}{% endblock %}
+
+{% block window_title %}EDIT PROJECT - {{ project.title | upper }}{% endblock %}
+
+{% block window_controls %}
+<button class="control-button" onclick="window.close()">×</button>
+{% endblock %}
+
+{% block content %}
+<form method="post" class="form-container">
+    <label for="title" class="form-label">TITLE:</label>
+    <input type="text" id="title" name="title" value="{{ project.title }}" required class="form-input"><br>
+
+    <label for="description" class="form-label">DESCRIPTION:</label>
+    <textarea id="description" name="description" class="form-textarea">{{ project.description }}</textarea><br>
+
+    <label for="status" class="form-label">STATUS:</label>
+	<select id="status" name="status" class="select-input">
+		<option value="active" {% if project.status == 'active' %}selected{% endif %}>Active</option>
+		<option value="on hold" {% if project.status == 'on hold' %}selected{% endif %}>On Hold</option>
+		<option value="complete" {% if project.status == 'complete' %}selected{% endif %}>Complete</option>
+		<option value="archived" {% if project.status == 'archived' %}selected{% endif %}>Archived</option>
+		<option value="ongoing" {% if project.status == 'ongoing' %}selected{% endif %}>Ongoing</option>
+	</select><br>
+
+    <label for="start_date" class="form-label">START DATE:</label>
+    <input type="date" id="start_date" name="start_date" value="{{ project.start_date }}" required class="form-input"><br>
+
+    <label for="target_completion_date" class="form-label">TARGET COMPLETION DATE:</label>
+    <input type="date" id="target_completion_date" name="target_completion_date" value="{{ project.target_completion_date | default('') }}" class="form-input"><br>
+
+    <label for="actual_completion_date" class="form-label">ACTUAL COMPLETION DATE:</label>
+    <input type="date" id="actual_completion_date" name="actual_completion_date" value="{{ project.actual_completion_date | default('') }}" class="form-input"><br>
+
+    <h2 class="section-title">UPDATES</h2>
+    {% if project.updates %}
+        {% for update in project.updates %}
+            <div class="update-item">
+                <input type="hidden" name="update_ids[]" value="{{ update.id }}">
+                <p class="body-text">
+                    <label for="update-{{ update.id }}" class="form-label"><strong class="timestamp">{{ update.timestamp }}</strong>:</label>
+                    <textarea id="update-{{ update.id }}" name="update_texts[]" class="form-textarea">{{ update.description }}</textarea>
+                </p>
+                {% if show_delete_buttons %}
+                    <a href="{{ url_for('delete_update', project_id=project.id, update_id=update.id) }}" class="delete-button">DELETE</a>
+                {% endif %}
+            </div>
+        {% else %}
+            <p class="body-text">NO UPDATES PROVIDED.</p>
+        {% endfor %}
+    {% endif %}
+
+    <button type="submit" class="primary-button">SAVE CHANGES</button>
+</form>
+<a href="{{ url_for('view_project', project_id=project.id) }}" class="primary-button">CANCEL</a>
+
+<h2 class="section-title">TASKS</h2>
+<div class="sort-options">
+SORT BY:
+{% if sort_by == 'start_date' %}
+    {% if order == 'asc' %}
+        <a href="{{ url_for('edit_project', project_id=project.id, sort_by='start_date', order='desc') }}" class="sort-link">START DATE ▲</a>
+    {% else %}
+        <a href="{{ url_for('edit_project', project_id=project.id, sort_by='start_date', order='asc') }}" class="sort-link">START DATE ▼</a>
+    {% endif %}
+{% else %}
+    <a href="{{ url_for('edit_project', project_id=project.id, sort_by='start_date', order='asc') }}" class="sort-link">START DATE</a>
+{% endif %}
+
+{% if sort_by == 'status' %}
+    {% if order == 'asc' %}
+        <a href="{{ url_for('edit_project', project_id=project.id, sort_by='status', order='desc') }}" class="sort-link">STATUS ▲</a>
+    {% else %}
+        <a href="{{ url_for('edit_project', project_id=project.id, sort_by='status', order='asc') }}" class="sort-link">STATUS ▼</a>
+    {% endif %}
+{% else %}
+    <a href="{{ url_for('edit_project', project_id=project.id, sort_by='status', order='asc') }}" class="sort-link">STATUS</a>
+{% endif %}
+</div>
+<div class="list-container">
+{% if project.tasks %}
+    {% for task in project.tasks %}
+        <div class="list-item">
+            <div>
+                <p class="body-text"><strong>DESCRIPTION:</strong> {{ task.description }}</p>
+                <p class="body-text"><strong>STATUS:</strong> {{ task.status | upper }}</p>
+                {% if task.start_date %}<p class="body-text"><strong>START DATE:</strong> {{ task.start_date }}</p>{% endif %}
+                {% if task.target_completion_date %}<p class="body-text"><strong>TARGET COMPLETION DATE:</strong> {{ task.target_completion_date }}</p>{% endif %}
+                {% if task.actual_completion_date %}<p class="body-text"><strong>ACTUAL COMPLETION DATE:</strong> {{ task.actual_completion_date }}</p>{% endif %}
+                {% if task.additional_info %}<p class="body-text"><strong>ADDITIONAL INFO:</strong> {{ task.additional_info }}</p>{% endif %}
+            </div>
+            <div>
+                <a href="{{ url_for('edit_task', project_id=project.id, task_id=task.id) }}" class="primary-button">EDIT</a>
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <p class="body-text">NO TASKS ADDED YET.</p>
+{% endif %}
+{% endblock %}

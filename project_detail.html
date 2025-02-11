@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.title }} - Project Details{% endblock %}
+
+{% block window_title %}{{ project.title | upper }} - PROJECT DETAILS{% endblock %}
+
+{% block window_controls %}
+<a href="{{ url_for('edit_project', project_id=project.id) }}" class="control-button">EDIT PROJECT</a>
+<a href="{{ url_for('list_projects_by_category', category=project.status) }}" class="control-button">BACK TO {{ project.status | upper }} PROJECTS</a>
+{% endblock %}
+
+{% block content %}
+<p class="body-text"><strong>DESCRIPTION:</strong> <pre class="description-text text-wrap">{{ project.description | default('No description provided') }}</pre></p>
+<p class="body-text"><strong>STATUS:</strong> {{ project.status | upper }}</p>
+<p class="body-text"><strong>START DATE:</strong> {{ project.start_date }}</p>
+{% if project.target_completion_date %}
+    <p class="body-text"><strong>TARGET COMPLETION DATE:</strong> {{ project.target_completion_date }}</p>
+{% endif %}
+{% if project.actual_completion_date %}
+    <p class="body-text"><strong>ACTUAL COMPLETION DATE:</strong> {{ project.actual_completion_date }}</p>
+{% endif %}
+
+<h2 class="section-title">UPDATES</h2>
+{% if project.updates %}
+    {% for update in project.updates %}
+        <div class="update-item">
+            <p class="body-text">
+                <strong class="timestamp">{{ update.timestamp }}</strong>: <pre class="update-description text-wrap">{{ update.description }}</pre>
+            </p>
+        </div>
+    {% else %}
+        <p class="body-text">NO UPDATES PROVIDED.</p>
+    {% endfor %}
+{% endif %}
+
+<div class="app-window">
+    <div class="title-bar">
+        <span class="window-title">ADD NEW UPDATE</span>
+    </div>
+    <div class="main-content">
+        <form method="post" action="{{ url_for('add_update', project_id=project.id) }}" class="form-container">
+            <label for="update_text" class="form-label">UPDATE:</label>
+            <textarea id="update_text" name="update_text" class="form-textarea"></textarea><br>
+            <button type="submit" class="primary-button">ADD UPDATE</button>
+        </form>
+    </div>
+</div>
+
+<h2 class="section-title">TASKS</h2>
+
+<div class="filter-section">
+    <p class="body-text"><strong>FILTER BY TASK STATUS:</strong></p>
+    <form method="GET" id="filterForm" action="{{ url_for('view_project', project_id=project.id) }}">
+        <input type="hidden" name="sort_by" value="{{ sort_by }}">
+        <input type="hidden" name="order" value="{{ order }}">
+        <label class="checkbox-label">
+            <input type="checkbox" name="task_status" value="active" {% if 'active' in selected_task_statuses %}checked{% endif %} onchange="document.getElementById('filterForm').submit()"> Active
+        </label>
+        <label class="checkbox-label">
+            <input type="checkbox" name="task_status" value="on hold" {% if 'on hold' in selected_task_statuses %}checked{% endif %} onchange="document.getElementById('filterForm').submit()"> On Hold
+        </label>
+        <label class="checkbox-label">
+            <input type="checkbox" name="task_status" value="completed" {% if 'completed' in selected_task_statuses %}checked{% endif %} onchange="document.getElementById('filterForm').submit()"> Completed
+        </label>
+        <label class="checkbox-label">
+            <input type="checkbox" name="task_status" value="cancelled" {% if 'cancelled' in selected_task_statuses %}checked{% endif %} onchange="document.getElementById('filterForm').submit()"> Cancelled
+        </label>
+    </form>
+</div>
+
+<div class="sort-options">
+    SORT BY:
+    {% if sort_by == 'due_date' %}
+        {% if order == 'asc' %}
+            <a href="{{ url_for('view_project', project_id=project.id, sort_by='due_date', order='desc', task_status=selected_task_statuses) }}" class="sort-link">DUE DATE ▲</a>
+        {% else %}
+            <a href="{{ url_for('view_project', project_id=project.id, sort_by='due_date', order='asc', task_status=selected_task_statuses) }}" class="sort-link">DUE DATE ▼</a>
+        {% endif %}
+    {% else %}
+        <a href="{{ url_for('view_project', project_id=project.id, sort_by='due_date', order='asc', task_status=selected_task_statuses) }}" class="sort-link">DUE DATE</a>
+    {% endif %}
+</div>
+
+<div class="list-container">
+    {% if project.tasks %}
+        {% for task in project.tasks %}
+            <div class="list-item">
+                <div>
+                    <p class="body-text"><strong>DESCRIPTION:</strong> {{ task.description }}</p>
+                    <p class="body-text"><strong>STATUS:</strong> {{ task.status | upper }}</p>
+                    {% if task.start_date %}<p class="body-text"><strong>START DATE:</strong> {{ task.start_date }}</p>{% endif %}
+                    {% if task.target_completion_date %}<p class="body-text"><strong>TARGET COMPLETION DATE:</strong> {{ task.target_completion_date }}</p>{% endif %}
+                    {% if task.actual_completion_date %}<p class="body-text"><strong>ACTUAL COMPLETION DATE:</strong> {{ task.actual_completion_date }}</p>{% endif %}
+                    {% if task.additional_info %}<p class="body-text"><strong>ADDITIONAL INFO:</strong> <div class="task-additional-info-container"><pre class="text-wrap">{{ task.additional_info }}</pre></div></p>{% endif %}
+                </div>
+                <div>
+                    <a href="{{ url_for('edit_task', project_id=project.id, task_id=task.id) }}" class="primary-button">EDIT</a>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p class="body-text">NO TASKS ADDED YET.</p>
+    {% endif %}
+</div>
+
+<div class="app-window">
+    <div class="title-bar">
+        <span class="window-title">ADD NEW TASK</span>
+    </div>
+    <div class="main-content">
+        <form method="post" action="{{ url_for('add_task', project_id=project.id) }}" class="form-container">
+            <label for="description" class="form-label">DESCRIPTION:</label>
+            <input type="text" id="description" name="description" required class="form-input"><br>
+
+            <label for="additional_info" class="form-label">ADDITIONAL INFO:</label>
+            <textarea id="additional_info" name="additional_info" class="form-textarea"></textarea><br>
+
+            <label for="start_date" class="form-label">START DATE:</label>
+            <input type="date" id="start_date" name="start_date" class="form-input"><br>
+
+            <label for="target_completion_date" class="form-label">TARGET COMPLETION DATE:</label>
+            <input type="date" id="target_completion_date" name="target_completion_date" class="form-input"><br>
+
+            <label for="actual_completion_date" class="form-label">ACTUAL COMPLETION DATE:</label>
+            <input type="date" id="actual_completion_date" name="actual_completion_date" class="form-input"><br>
+
+            <label for="status" class="form-label">STATUS:</label>
+            <select id="status" name="status" class="select-input">
+                <option value="active">Active</option>
+                <option value="completed">Completed</option>
+                <option value="on hold">On Hold</option>
+            </select><br>
+
+            <button type="submit" class="primary-button">ADD TASK</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

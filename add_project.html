@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Add Project{% endblock %}
+
+{% block window_title %}ADD A NEW PROJECT{% endblock %}
+
+{% block window_controls %}
+<button class="control-button" onclick="window.close()">×</button>
+{% endblock %}
+
+{% block content %}
+<form method="post" class="form-container">
+    <label for="title" class="form-label">TITLE:</label>
+    <input type="text" id="title" name="title" required class="form-input"><br>
+
+    <label for="description" class="form-label">DESCRIPTION:</label>
+    <textarea id="description" name="description" class="form-textarea"></textarea><br>
+
+    <label for="start_date" class="form-label">START DATE:</label>
+    <input type="date" id="start_date" name="start_date" required class="form-input"><br>
+
+    <label for="target_completion_date" class="form-label">TARGET COMPLETION DATE:</label>
+    <input type="date" id="target_completion_date" name="target_completion_date" class="form-input"><br>
+
+    <label for="status" class="form-label">STATUS:</label>
+    <select id="status" name="status" class="select-input">
+        <option value="active">Active</option>
+        <option value="on hold">On Hold</option>
+        <option value="ongoing">Ongoing</option>
+    </select><br>
+
+    <button type="submit" class="primary-button">ADD PROJECT</button>
+</form>
+{% endblock %}

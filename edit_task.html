@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Task - {{ task.description }}{% endblock %}
+
+{% block window_title %}EDIT TASK{% endblock %}
+
+{% block window_controls %}
+<button class="control-button" onclick="window.close()">×</button>
+{% endblock %}
+
+{% block content %}
+<form method="post" class="form-container">
+    <label for="description" class="form-label">DESCRIPTION:</label>
+    <input type="text" id="description" name="description" value="{{ task.description }}" required class="form-input"><br>
+
+    <label for="additional_info" class="form-label">ADDITIONAL INFO:</label>
+    <textarea id="additional_info" name="additional_info" class="form-textarea">{{ task.additional_info }}</textarea><br>
+
+    <label for="status" class="form-label">STATUS:</label>
+    <select id="status" name="status" class="select-input">
+        <option value="active" {% if task.status == 'active' %}selected{% endif %}>Active</option>
+        <option value="completed" {% if task.status == 'completed' %}selected{% endif %}>Completed</option>
+        <option value="on hold" {% if task.status == 'on hold' %}selected{% endif %}>On Hold</option>
+        <option value="cancelled" {% if task.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+    </select><br>
+
+    <label for="start_date" class="form-label">START DATE:</label>
+    <input type="date" id="start_date" name="start_date" value="{{ task.start_date | default('') }}" class="form-input"><br>
+
+    <label for="target_completion_date" class="form-label">TARGET COMPLETION DATE:</label>
+    <input type="date" id="target_completion_date" name="target_completion_date" value="{{ task.target_completion_date | default('') }}" class="form-input"><br>
+
+    <label for="actual_completion_date" class="form-label">ACTUAL COMPLETION DATE:</label>
+    <input type="date" id="actual_completion_date" name="actual_completion_date" value="{{ task.actual_completion_date | default('') }}" class="form-input"><br>
+
+    <button type="submit" class="primary-button">SAVE CHANGES</button>
+</form>
+<a href="{{ url_for('view_project', project_id=project_id) }}" class="primary-button">CANCEL</a>
+{% endblock %}
