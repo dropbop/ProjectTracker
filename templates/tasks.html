@@ -28,6 +28,9 @@
             <label class="checkbox-label">
                 <input type="checkbox" name="project_status" value="archived" {% if 'archived' in selected_project_statuses %}checked{% endif %} onchange="document.getElementById('filterForm').submit()"> Archived
             </label>
+            <label class="checkbox-label">
+                <input type="checkbox" name="project_status" value="ongoing" {% if 'ongoing' in selected_project_statuses %}checked{% endif %} onchange="document.getElementById('filterForm').submit()"> Ongoing
+            </label>
         </div>
 
         <div class="filter-section">
