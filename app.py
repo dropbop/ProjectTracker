@@ -187,7 +187,7 @@ def list_all_tasks():
     """Lists all tasks with optional sorting and filtering."""
     sort_by = request.args.get('sort_by', 'due_date')
     order = request.args.get('order', 'asc')
-    selected_project_statuses = request.args.getlist('project_status') or ['active']  # Default to ['active']
+    selected_project_statuses = request.args.getlist('project_status') or ['active', 'ongoing']  # Default to ['active', 'ongoing']
     selected_task_statuses = request.args.getlist('task_status') or ['active']  # Default to ['active']
 
     tasks = get_all_tasks(sort_by, order, selected_project_statuses, selected_task_statuses)
