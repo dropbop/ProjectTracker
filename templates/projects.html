@@ -4,11 +4,14 @@
 
 {% block window_title %}PROJECTS - {{ current_category | upper }}{% endblock %}
 
+{# --- Replaced Window Controls Block --- #}
 {% block window_controls %}
+<a href="{{ url_for('anki_review') }}" class="control-button">FLASHCARDS</a>
 <a href="{{ url_for('add_project') }}" class="control-button">ADD NEW PROJECT</a>
 <a href="{{ url_for('list_all_tasks') }}" class="control-button">VIEW ALL TASKS</a>
-<a href="{{ url_for('productivity_calendar') }}" class="control-button">VIEW CALENDAR</a>  <!-- Added line -->
+<a href="{{ url_for('productivity_calendar') }}" class="control-button">VIEW CALENDAR</a>
 {% endblock %}
+{# --- End Replaced Block --- #}
 
 {% block content %}
 <form method="POST" action="{{ url_for('set_style_route') }}" style="margin-bottom: 16px;">
@@ -30,35 +33,41 @@
 
 <div class="sort-options">
     SORT BY:
+    {% set base_url = url_for('list_projects_by_category', category=current_category) %} {# Define base URL for cleaner links #}
+    {# --- Refactored Sort Links for Readability --- #}
+    {# Start Date Sort Link #}
     {% if sort_by == 'start_date' %}
         {% if sort_order == 'asc' %}
-            <a href="{{ url_for('list_projects_by_category', category=current_category, sort_by='start_date', order='desc') }}" class="sort-link">START DATE ▲</a>
+            <a href="{{ base_url }}?sort_by=start_date&order=desc" class="sort-link">START DATE ▲</a>
         {% else %}
-            <a href="{{ url_for('list_projects_by_category', category=current_category, sort_by='start_date', order='asc') }}" class="sort-link">START DATE ▼</a>
+            <a href="{{ base_url }}?sort_by=start_date&order=asc" class="sort-link">START DATE ▼</a>
         {% endif %}
     {% else %}
-        <a href="{{ url_for('list_projects_by_category', category=current_category, sort_by='start_date', order='asc') }}" class="sort-link">START DATE</a>
+        <a href="{{ base_url }}?sort_by=start_date&order=asc" class="sort-link">START DATE</a>
     {% endif %}
 
+    {# Target Completion Date Sort Link #}
     {% if sort_by == 'target_completion_date' %}
         {% if sort_order == 'asc' %}
-            <a href="{{ url_for('list_projects_by_category', category=current_category, sort_by='target_completion_date', order='desc') }}" class="sort-link">TARGET COMPLETION DATE ▲</a>
+            <a href="{{ base_url }}?sort_by=target_completion_date&order=desc" class="sort-link">TARGET COMPLETION DATE ▲</a>
         {% else %}
-            <a href="{{ url_for('list_projects_by_category', category=current_category, sort_by='target_completion_date', order='asc') }}" class="sort-link">TARGET COMPLETION DATE ▼</a>
+            <a href="{{ base_url }}?sort_by=target_completion_date&order=asc" class="sort-link">TARGET COMPLETION DATE ▼</a>
         {% endif %}
     {% else %}
-        <a href="{{ url_for('list_projects_by_category', category=current_category, sort_by='target_completion_date', order='asc') }}" class="sort-link">TARGET COMPLETION DATE</a>
+        <a href="{{ base_url }}?sort_by=target_completion_date&order=asc" class="sort-link">TARGET COMPLETION DATE</a>
     {% endif %}
 
+    {# Next Task Due Date Sort Link #}
     {% if sort_by == 'next_task_due_date' %}
         {% if sort_order == 'asc' %}
-            <a href="{{ url_for('list_projects_by_category', category=current_category, sort_by='next_task_due_date', order='desc') }}" class="sort-link">NEXT TASK DUE DATE ▲</a>
+            <a href="{{ base_url }}?sort_by=next_task_due_date&order=desc" class="sort-link">NEXT TASK DUE DATE ▲</a>
         {% else %}
-            <a href="{{ url_for('list_projects_by_category', category=current_category, sort_by='next_task_due_date', order='asc') }}" class="sort-link">NEXT TASK DUE DATE ▼</a>
+            <a href="{{ base_url }}?sort_by=next_task_due_date&order=asc" class="sort-link">NEXT TASK DUE DATE ▼</a>
         {% endif %}
     {% else %}
-        <a href="{{ url_for('list_projects_by_category', category=current_category, sort_by='next_task_due_date', order='asc') }}" class="sort-link">NEXT TASK DUE DATE</a>
+        <a href="{{ base_url }}?sort_by=next_task_due_date&order=asc" class="sort-link">NEXT TASK DUE DATE</a>
     {% endif %}
+    {# --- End Refactored Sort Links --- #}
 </div>
 
 <div class="list-container">
@@ -66,10 +75,15 @@
         <div class="list-item">
             <h3 class="list-item-title"><a href="{{ url_for('view_project', project_id=project.id) }}">{{ project.title | upper }}</a></h3>
             <p class="body-text"><strong>DESCRIPTION:</strong></p>
+            {# Use text-wrap class for better line breaking #}
             <p class="body-text"><pre class="description-text text-wrap">{{ project.description | default('NO DESCRIPTION PROVIDED') }}</pre></p>
-            <p class="body-text"><strong>START DATE:</strong> {{ project.start_date }}</p>
+            <p class="body-text"><strong>START DATE:</strong> {{ project.start_date if project.start_date else 'N/A' }}</p>
             {% if project.target_completion_date %}
                 <p class="body-text"><strong>TARGET COMPLETION DATE:</strong> {{ project.target_completion_date }}</p>
+            {% endif %}
+            {# Display Next Task Due Date if available #}
+            {% if project.next_task_due_date and project.next_task_due_date != '9999-12-31' %}
+                <p class="body-text"><strong>NEXT TASK DUE:</strong> {{ project.next_task_due_date }}</p>
             {% endif %}
             <p class="body-text"><strong>STATUS:</strong> {{ project.status | upper }}</p>
         </div>

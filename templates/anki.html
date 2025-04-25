@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Anki Flashcards{% endblock %}
+
+{% block window_title %}ANKI FLASHCARDS{% endblock %}
+
+{% block window_controls %}
+<a href="{{ url_for('manage_cards') }}" class="control-button">MANAGE CARDS</a>
+<a href="{{ url_for('list_projects_by_category') }}" class="control-button">BACK TO PROJECTS</a>
+{% endblock %}
+
+{% block content %}
+{% if due_cards %}
+    <div class="card-container">
+        <div class="current-card">
+            <div class="card-front">
+                <h2 class="section-title">QUESTION</h2>
+                <div class="card-content">
+                    <div class="card-text">{{ due_cards[0].front }}</div>
+                </div>
+                <button id="show-answer" class="primary-button">SHOW ANSWER</button>
+            </div>
+            
+            <div class="card-back" style="display: none;">
+                <h2 class="section-title">ANSWER</h2>
+                <div class="card-content">
+                    <div class="card-text">{{ due_cards[0].back }}</div>
+                </div>
+                
+                <h3 class="section-title">HOW WELL DID YOU REMEMBER?</h3>
+                <form action="{{ url_for('review_card', card_id=due_cards[0].id) }}" method="post" class="rating-form">
+                    <div class="rating-buttons">
+                        <button type="submit" name="rating" value="0" class="rating-button rating-0">FAILED (0)</button>
+                        <button type="submit" name="rating" value="1" class="rating-button rating-1">HARD (1)</button>
+                        <button type="submit" name="rating" value="2" class="rating-button rating-2">DIFFICULT (2)</button>
+                        <button type="submit" name="rating" value="3" class="rating-button rating-3">GOOD (3)</button>
+                        <button type="submit" name="rating" value="4" class="rating-button rating-4">EASY (4)</button>
+                        <button type="submit" name="rating" value="5" class="rating-button rating-5">PERFECT (5)</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="stats-container">
+            <p class="body-text"><strong>CARDS REMAINING TODAY:</strong> {{ due_cards|length }}</p>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('show-answer').addEventListener('click', function() {
+            document.querySelector('.card-front').style.display = 'none';
+            document.querySelector('.card-back').style.display = 'block';
+        });
+    </script>
+{% else %}
+    <div class="no-cards">
+        <h2 class="section-title">NO CARDS DUE FOR REVIEW</h2>
+        <p class="body-text">You have completed all your reviews for today!</p>
+        <a href="{{ url_for('manage_cards') }}" class="primary-button">MANAGE CARDS</a>
+    </div>
+{% endif %}
+{% endblock %}
